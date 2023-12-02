@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>在我心中有一個夢</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="在我心中有一個夢">
+<meta property="og:url" content="http://example.com/index.html">
+<meta property="og:site_name" content="在我心中有一個夢">
+<meta property="og:locale" content="en_US">
+<meta property="article:author" content="Jeff Tseng">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="在我心中有一個夢" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">在我心中有一個夢</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">程式備忘錄</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-rpi_yocto_note_01" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/10/20/rpi_yocto_note_01/" class="article-date">
+  <time class="dt-published" datetime="2023-10-20T09:38:14.000Z" itemprop="datePublished">2023-10-20</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/10/20/rpi_yocto_note_01/">Raspberry PI Yocto研究筆記(一)</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>因為在工作上會在RDK-B的框架下開發，而RDK-B的Build system就是用Yocto，終於最近比較有動力，就搭建一下環境及手邊樹梅派的板子，把這部份摸熟一點也記錄一下。</p>
+<h2 id="Yocto簡介"><a href="#Yocto簡介" class="headerlink" title="Yocto簡介"></a>Yocto簡介</h2><p>做嵌入式軟體開發應該都會常常聽到BuildRoot和Yocto，他們都是一種建立Embedded Linux distribution的build system，關於更多Yocto介紹可以到他們官網了解更多，這邊就不再贅述，接下來就是開始建置環境。</p>
+<h2 id="環境建置"><a href="#環境建置" class="headerlink" title="環境建置"></a>環境建置</h2><p>首先需要在一台電腦上先安裝虛擬磯的環境，我是習慣用VMWare Palyer，接著就是開一個新的虛擬磯，大概的配置如下:</p>
+<ol>
+<li>CPU核心: 8</li>
+<li>RAM: 8G</li>
+<li>OS: Ubuntu 20.04.6 LTS</li>
+<li>Storage: 120 GB</li>
+</ol>
+<p>一切都就緒後，就可以開始安裝相依性的套件</p>
+<h2 id="相依套件安裝"><a href="#相依套件安裝" class="headerlink" title="相依套件安裝"></a>相依套件安裝</h2><p>在編譯Yocto之前需要以下的相依套件，更多細節可參考 </p>
+<p><a target="_blank" rel="noopener" href="https://docs.yoctoproject.org/brief-yoctoprojectqs/index.html">https://docs.yoctoproject.org/brief-yoctoprojectqs/index.html</a></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install gawk wget git diffstat unzip texinfo gcc build-essential chrpath socat cpio python3 python3-pip python3-pexpect xz-utils debianutils iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev python3-subunit mesa-common-dev zstd liblz4-tool file locales libacl1</span><br><span class="line"></span><br><span class="line">locale-gen en_US.UTF-8</span><br></pre></td></tr></table></figure>
+<h2 id="配置及編譯"><a href="#配置及編譯" class="headerlink" title="配置及編譯"></a>配置及編譯</h2><p>首先當然需要先下載Yocto source code，我們先建立一個資料夾，並透過git clone source code.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> my-rpi &amp;&amp; <span class="built_in">cd</span> my-rpi</span><br><span class="line">git <span class="built_in">clone</span> -b kirkstone git://git.yoctoproject.org/poky.git</span><br></pre></td></tr></table></figure>
+
+<p>接著就是下載樹梅派meta層</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> -b kirkstone git://git.yoctoproject.org/meta-raspberrypi</span><br></pre></td></tr></table></figure>
+
+<p>初始化Yocto編譯環境</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">source</span> poky/oe-init-build-env build-rpi</span><br></pre></td></tr></table></figure>
+<p>新增剛剛下載的樹梅派meta層</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bitbake-layers add-layer ../meta-raspberrypi</span><br></pre></td></tr></table></figure>
+
+<p>增加Rapspberry Pi machine 的相關配置</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#配置machine</span></span><br><span class="line">sed -i <span class="string">&#x27;s/^MACHINE.*/MACHINE ?= &quot;raspberrypi3&quot;/g&#x27;</span> conf/local.conf</span><br><span class="line">sed -i <span class="string">&#x27;/^#DL_DIR ?= &quot;$&#123;TOPDIR&#125;\/downloads&quot;/ a DL_DIR ?= \&quot;$&#123;HOME&#125;/yocto/downloads&quot;&#x27;</span> conf/local.conf</span><br><span class="line">sed -i <span class="string">&#x27;s/^PACKAGE_CLASSES.*/PACKAGE_CLASSES ?= &quot;package_ipk&quot;/g&#x27;</span> conf/local.conf</span><br><span class="line"></span><br><span class="line"><span class="comment">#設定Rapspberry Pi透過Uboot開機</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;RPI_USE_U_BOOT = &quot;1&quot;&#x27;</span> &gt;&gt; conf/local.conf</span><br><span class="line"></span><br><span class="line"><span class="comment">#開啟uart console</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;ENABLE_UART = &quot;1&quot;&#x27;</span> &gt;&gt; conf/local.conf</span><br></pre></td></tr></table></figure>
+
+<p>編譯image</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bitbake core-image-minimal</span><br></pre></td></tr></table></figure>
+
+<p>編譯完成後image大概會在下面的路徑</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/my-rpi/build-rpi/tmp/deploy/images/raspberrypi3/core-image-minimal-raspberrypi3.wic.bz2</span><br></pre></td></tr></table></figure>
+<p>他是一個symbollink實際上對應到像這樣檔名的image</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">core-image-minimal-raspberrypi3-20231111193508.rootfs.wic.bz2</span><br></pre></td></tr></table></figure>
+<p>之後就可以透過balenaEtcher等工具燒錄image到SD卡</p>
+<p><img src="/../images/balenaEtcher_flash_compelete.png"></p>
+<p>開機後的console畫面會像這樣</p>
+<p><img src="/../images/console_snapshot.png"></p>
+<p>這樣就大功告成囉！</p>
+<h3 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h3><p><a target="_blank" rel="noopener" href="https://e61983.github.io/2021-07-26-building-raspberry-pi-systems-with-yocto/">使用 Yocto 打造你的 Raspberry Pi 系統</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/10/20/rpi_yocto_note_01/" data-id="clpo1km9p0000dhuzh0p9hjdc" data-title="Raspberry PI Yocto研究筆記(一)" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/10/">October 2023</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2023/10/20/rpi_yocto_note_01/">Raspberry PI Yocto研究筆記(一)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2023 Jeff Tseng<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
