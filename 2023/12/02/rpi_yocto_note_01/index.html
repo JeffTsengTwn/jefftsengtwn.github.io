@@ -1,147 +1,198 @@
-<!DOCTYPE HTML>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="pragma" content="no-cache">
-  <meta http-equiv="cache-control" content="no-cache">
-  <meta http-equiv="expires" content="0">
-  
-  <title>Raspberry PI Yocto研究筆記(一) | 小曾實戰錄</title>
-  <meta name="author" content="Jeff Tseng">
-  
-  <meta name="description" content="前言因為在工作上會在RDK-B的框架下開發，而RDK-B的Build system就是用Yocto，終於最近比較有動力，就搭建一下環境及手邊樹梅派的板子，把這部份摸熟一點也記錄一下。
-Yocto簡介做嵌入式軟體開發應該都會常常聽到BuildRoot和Yocto，他們都是一種建立Embedded Linux distribution的build system，關於更多Yocto介紹可以到他們官網了解更多，這邊就不再贅述，接下來就是開始建置環境。
-環境建置首先需要在一台電腦上先安裝虛擬磯的環境，我是習慣用VMWare Palyer，接著就是開一個新的虛擬磯，大概的配置如下:
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
 
-CPU核心: 8
-RAM: 8G
-OS: Ubuntu 20.04.6 LTS
-Storage: 120 GB
+<link rel="stylesheet" href="/css/main.css">
 
-一切都就緒後，就可以開始安裝相依性的套件
-相依套件安裝在編譯Yocto之前需要以下的相依套件，更多細節可參考"> 
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <meta property="og:title" content="Raspberry PI Yocto研究筆記(一)"/>
-  <meta property="og:site_name" content="小曾實戰錄"/>
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
 
-  
-    <meta property="og:image" content=""/>
-  
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
 
-  
-    <link rel="alternative" href="/atom.xml" title="小曾實戰錄" type="application/atom+xml">
-  
-  
-    <link href="/favicon.png" rel="icon">
-  
-  
-  <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen" type="text/css">
-  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
-  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
-  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
-  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
-  <link rel="stylesheet" href="/css/prism.css" media="screen" type="text/css">
-  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
-  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  <meta name="description" content="前言因為在工作上會在RDK-B的框架下開發，而RDK-B的Build system就是用Yocto，終於最近比較有動力，就搭建一下環境及手邊樹梅派的板子，把這部份摸熟一點也記錄一下。 Yocto簡介做嵌入式軟體開發應該都會常常聽到BuildRoot和Yocto，他們都是一種建立Embedded Linux distribution的build system，關於更多Yocto介紹可以到他們官網了解">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Raspberry PI Yocto研究筆記(一)">
+<meta property="og:url" content="http://example.com/2023/12/02/rpi_yocto_note_01/index.html">
+<meta property="og:site_name" content="小曾實戰錄">
+<meta property="og:description" content="前言因為在工作上會在RDK-B的框架下開發，而RDK-B的Build system就是用Yocto，終於最近比較有動力，就搭建一下環境及手邊樹梅派的板子，把這部份摸熟一點也記錄一下。 Yocto簡介做嵌入式軟體開發應該都會常常聽到BuildRoot和Yocto，他們都是一種建立Embedded Linux distribution的build system，關於更多Yocto介紹可以到他們官網了解">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/images/balenaEtcher_flash_compelete.png">
+<meta property="og:image" content="http://example.com/images/console_snapshot.png">
+<meta property="article:published_time" content="2023-12-02T13:08:00.000Z">
+<meta property="article:modified_time" content="2023-12-02T13:08:33.477Z">
+<meta property="article:author" content="Jeff Tseng">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/balenaEtcher_flash_compelete.png">
 
-  <script src="/js/jquery-2.0.3.min.js"></script>
+<link rel="canonical" href="http://example.com/2023/12/02/rpi_yocto_note_01/">
 
-  <!-- analytics -->
-  
-  <!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-70812759-1"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
 
-  gtag('config', 'UA-70812759-1');
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
 </script>
 
+  <title>Raspberry PI Yocto研究筆記(一) | 小曾實戰錄</title>
+  
 
 
 
 
 
-<meta name="generator" content="Hexo 6.3.0"></head>
 
- <body>  
-  <nav id="main-nav" class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-    <div class="container">
-      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-		<span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-	  <a class="navbar-brand" href="/">小曾實戰錄</a>
-      <div class="collapse navbar-collapse nav-menu">
-		<ul class="nav navbar-nav">
-		  
-		  <li>
-			<a href="/archives" title="All the articles.">
-			  <i class=""></i>Archives
-			</a>
-		  </li>
-		  
-		  <li>
-			<a href="/categories" title="All the categories.">
-			  <i class=""></i>Categories
-			</a>
-		  </li>
-		  
-		  <li>
-			<a href="/tags" title="All the tags.">
-			  <i class=""></i>Tags
-			</a>
-		  </li>
-		  
-		  <li>
-			<a href="/about" title="About me.">
-			  <i class=""></i>About
-			</a>
-		  </li>
-		  
-		  <li>
-			<a href="/atom.xml" title="Subscribe me.">
-			  <i class=""></i>RSS
-			</a>
-		  </li>
-		  
-		</ul>
-      </div>
-    </div> <!-- container -->
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">小曾實戰錄</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">我的程式備忘錄</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
 </nav>
-<div class="clearfix"></div>
-
-  <div class="container">
-  	<div class="content">
-    	 
-
-
-	
-		<div class="page-header">
-			<h1> Raspberry PI Yocto研究筆記(一)</h1>
-		</div>
-	
 
 
 
-<div class="row post">
-	<!-- cols -->
-	
-	<div id="top_meta"></div>
-	<div class="col-md-9">
-	
 
-	<!-- content -->
-	<div class="mypage">		
-	  		
+</div>
+    </header>
 
-	  <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>因為在工作上會在RDK-B的框架下開發，而RDK-B的Build system就是用Yocto，終於最近比較有動力，就搭建一下環境及手邊樹梅派的板子，把這部份摸熟一點也記錄一下。</p>
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/12/02/rpi_yocto_note_01/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Jeff Tseng">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小曾實戰錄">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Raspberry PI Yocto研究筆記(一)
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2023-12-02 21:08:00 / Modified: 21:08:33" itemprop="dateCreated datePublished" datetime="2023-12-02T21:08:00+08:00">2023-12-02</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>因為在工作上會在RDK-B的框架下開發，而RDK-B的Build system就是用Yocto，終於最近比較有動力，就搭建一下環境及手邊樹梅派的板子，把這部份摸熟一點也記錄一下。</p>
 <h2 id="Yocto簡介"><a href="#Yocto簡介" class="headerlink" title="Yocto簡介"></a>Yocto簡介</h2><p>做嵌入式軟體開發應該都會常常聽到BuildRoot和Yocto，他們都是一種建立Embedded Linux distribution的build system，關於更多Yocto介紹可以到他們官網了解更多，這邊就不再贅述，接下來就是開始建置環境。</p>
 <h2 id="環境建置"><a href="#環境建置" class="headerlink" title="環境建置"></a>環境建置</h2><p>首先需要在一台電腦上先安裝虛擬磯的環境，我是習慣用VMWare Palyer，接著就是開一個新的虛擬磯，大概的配置如下:</p>
 <ol>
@@ -182,126 +233,176 @@ Storage: 120 GB
 <p>這樣就大功告成囉！</p>
 <h3 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h3><p><a target="_blank" rel="noopener" href="https://e61983.github.io/2021-07-26-building-raspberry-pi-systems-with-yocto/">使用 Yocto 打造你的 Raspberry Pi 系統</a></p>
 
-	  <div class="article-footer-copyright">
-
-    本博客采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享署名-非商业性使用-相同方式共享 4.0 国际许可协议(CC BY-NC-SA 4.0) 发布.</a>
-</div>
-
-	</div>
-
-	
-	
-	<div>
-  	<center>
-
-	<div class="pagination">
+    </div>
 
     
-</div>
-
-
-    </center>
-	</div>
-	
-	<!-- comment -->
-	<!--
-<section id="comment">
-    <h2 class="title">Comments</h2>
-
     
-</section>
-
--->
-	
-	
-	
-	</div> <!-- col-md-9/col-md-12 -->
-
-
-	
-	<div id="side_meta">
-		<div class="col-md-3" id="post_meta"> 
-
-	<!-- date -->
-	
-	<div class="meta-widget">
-	<i class="fa fa-clock-o"></i>
-	2023-12-02 
-	</div>
-	
-
-	<!-- categories -->
     
 
-	<!-- tags -->
-		
+      <footer class="post-footer">
 
-	<!-- toc -->
-	<div class="meta-widget">
-	
-	</div>
-	
-    <hr>
-	
-</div><!-- col-md-3 -->
-
-		
-
-	</div>
-	
-		
-
-</div><!-- row -->
-
-<!--
- -->
+        
 
 
-
-	</div>
-  </div>
-  <div class="container-narrow">
-  <footer> <p>
+        
+      </footer>
+    
+  </article>
   
-  &copy; 2023 Jeff Tseng's Blog
   
-      powered by <a href="http://hexo.io/" target="_blank">Hexo</a>.Theme <a href="https://github.com/Ares-X/hexo-theme-freemind.bithack" target="_blank">freemind.bithack</a>  
-</p>
- </footer>
-</div> <!-- container-narrow -->
   
 
 
-  
-<a id="gotop" href="#">   
-  <span>⬆︎TOP</span>
-</a>
 
-<script src="/js/jquery.imagesloaded.min.js"></script>
-<script src="/js/gallery.js"></script>
-<script src="/js/bootstrap.min.js"></script>
-<script src="/js/main.js"></script>
-<script src="/js/search.js"></script> 
+          </div>
+          
 
-
-<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
-<script src="/fancybox/jquery.fancybox.pack.js"></script>
-<script type="text/javascript">
-(function($){
-  $('.fancybox').fancybox();
-})(jQuery);
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
 </script>
 
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Yocto%E7%B0%A1%E4%BB%8B"><span class="nav-number">2.</span> <span class="nav-text">Yocto簡介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%92%B0%E5%A2%83%E5%BB%BA%E7%BD%AE"><span class="nav-number">3.</span> <span class="nav-text">環境建置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B8%E4%BE%9D%E5%A5%97%E4%BB%B6%E5%AE%89%E8%A3%9D"><span class="nav-number">4.</span> <span class="nav-text">相依套件安裝</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E5%8F%8A%E7%B7%A8%E8%AD%AF"><span class="nav-number">5.</span> <span class="nav-text">配置及編譯</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99"><span class="nav-number">5.1.</span> <span class="nav-text">參考資料</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Jeff Tseng</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">1</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+  </nav>
+</div>
 
 
-   <script type="text/javascript">      
-     var search_path = "search.xml";
-	 if (search_path.length == 0) {
-	 	search_path = "search.xml";
-	 }
-	 var path = "/" + search_path;
-     searchFunc(path, 'local-search-input', 'local-search-result');
-   </script>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jeff Tseng</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
 
 </body>
-   </html>
+</html>
