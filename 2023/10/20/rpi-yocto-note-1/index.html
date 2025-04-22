@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="前言因為在工作上會在RDK-B的框架下開發，而RDK-B的Build system就是用Yocto，終於最近比較有動力，就搭建一下環境及手邊樹梅派的板子，把這部份摸熟一點也記錄一下。 Yocto簡介做嵌入式軟體開發應該都會常常聽到BuildRoot和Yocto，他們都是一種建立Embedded Linux distribution的build system，關於更多Yocto介紹可以到他們官網了解">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【Yocto】Raspberry PI Yocto 編譯環境建置">
+<meta property="og:url" content="http://example.com/2023/10/20/rpi-yocto-note-1/index.html">
+<meta property="og:site_name" content="在我心中有一個夢">
+<meta property="og:description" content="前言因為在工作上會在RDK-B的框架下開發，而RDK-B的Build system就是用Yocto，終於最近比較有動力，就搭建一下環境及手邊樹梅派的板子，把這部份摸熟一點也記錄一下。 Yocto簡介做嵌入式軟體開發應該都會常常聽到BuildRoot和Yocto，他們都是一種建立Embedded Linux distribution的build system，關於更多Yocto介紹可以到他們官網了解">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/images/balenaEtcher_flash_compelete.png">
+<meta property="og:image" content="http://example.com/images/console_snapshot.png">
+<meta property="article:published_time" content="2023-10-20T09:38:14.000Z">
+<meta property="article:modified_time" content="2025-04-22T07:06:59.441Z">
+<meta property="article:author" content="Jeff Tseng">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/balenaEtcher_flash_compelete.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>【Yocto】Raspberry PI Yocto 編譯環境建置</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/JeffTsengTwn">Projects</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2024/03/13/busybox-ping-with-google-DNS/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2023/10/20/rpi-yocto-note-1/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2023/10/20/rpi-yocto-note-1/&text=【Yocto】Raspberry PI Yocto 編譯環境建置"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2023/10/20/rpi-yocto-note-1/&title=【Yocto】Raspberry PI Yocto 編譯環境建置"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2023/10/20/rpi-yocto-note-1/&is_video=false&description=【Yocto】Raspberry PI Yocto 編譯環境建置"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=【Yocto】Raspberry PI Yocto 編譯環境建置&body=Check out this article: http://example.com/2023/10/20/rpi-yocto-note-1/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2023/10/20/rpi-yocto-note-1/&title=【Yocto】Raspberry PI Yocto 編譯環境建置"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2023/10/20/rpi-yocto-note-1/&title=【Yocto】Raspberry PI Yocto 編譯環境建置"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2023/10/20/rpi-yocto-note-1/&title=【Yocto】Raspberry PI Yocto 編譯環境建置"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2023/10/20/rpi-yocto-note-1/&title=【Yocto】Raspberry PI Yocto 編譯環境建置"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2023/10/20/rpi-yocto-note-1/&name=【Yocto】Raspberry PI Yocto 編譯環境建置&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2023/10/20/rpi-yocto-note-1/&t=【Yocto】Raspberry PI Yocto 編譯環境建置"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Yocto%E7%B0%A1%E4%BB%8B"><span class="toc-number">2.</span> <span class="toc-text">Yocto簡介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%92%B0%E5%A2%83%E5%BB%BA%E7%BD%AE"><span class="toc-number">3.</span> <span class="toc-text">環境建置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%B8%E4%BE%9D%E5%A5%97%E4%BB%B6%E5%AE%89%E8%A3%9D"><span class="toc-number">4.</span> <span class="toc-text">相依套件安裝</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E5%8F%8A%E7%B7%A8%E8%AD%AF"><span class="toc-number">5.</span> <span class="toc-text">配置及編譯</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99"><span class="toc-number">6.</span> <span class="toc-text">參考資料</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        【Yocto】Raspberry PI Yocto 編譯環境建置
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Jeff Tseng</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2023-10-20T09:38:14.000Z" class="dt-published" itemprop="datePublished">2023-10-20</time>
+        
+      
+    </div>
+
+
+      
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>因為在工作上會在RDK-B的框架下開發，而RDK-B的Build system就是用Yocto，終於最近比較有動力，就搭建一下環境及手邊樹梅派的板子，把這部份摸熟一點也記錄一下。</p>
+<h2 id="Yocto簡介"><a href="#Yocto簡介" class="headerlink" title="Yocto簡介"></a>Yocto簡介</h2><p>做嵌入式軟體開發應該都會常常聽到BuildRoot和Yocto，他們都是一種建立Embedded Linux distribution的build system，關於更多Yocto介紹可以到他們官網了解更多，這邊就不再贅述，接下來就是開始建置環境。</p>
+<h2 id="環境建置"><a href="#環境建置" class="headerlink" title="環境建置"></a>環境建置</h2><p>首先需要在一台電腦上先安裝虛擬磯的環境，我是習慣用VMWare，接著就是開一個新的虛擬磯，大概的配置如下:</p>
+<ol>
+<li>CPU核心:8</li>
+<li>RAM:8G</li>
+<li>OS:20.04.6 LTS</li>
+<li>Storage: 120 GB</li>
+</ol>
+<p>一切都就緒後，就可以開始安裝相依性的套件</p>
+<h2 id="相依套件安裝"><a href="#相依套件安裝" class="headerlink" title="相依套件安裝"></a>相依套件安裝</h2><p>在編譯Yocto之前需要以下的相依套件，更多細節可參考 <a target="_blank" rel="noopener" href="https://docs.yoctoproject.org/brief-yoctoprojectqs/index.html">https://docs.yoctoproject.org/brief-yoctoprojectqs/index.html</a></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt install gawk wget git diffstat unzip texinfo gcc build-essential chrpath socat cpio python3 python3-pip python3-pexpect xz-utils debianutils iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev python3-subunit mesa-common-dev zstd liblz4-tool file locales libacl1</span><br><span class="line"></span><br><span class="line">$ sudo locale-gen en_US.UTF-8</span><br></pre></td></tr></table></figure>
+<h2 id="配置及編譯"><a href="#配置及編譯" class="headerlink" title="配置及編譯"></a>配置及編譯</h2><p>首先當然需要先下載Yocto source code，我們先建立一個資料夾，並透過git clone source code.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> my-rpi &amp;&amp; <span class="built_in">cd</span> my-rpi</span><br><span class="line">git <span class="built_in">clone</span> -b kirkstone git://git.yoctoproject.org/poky.git</span><br></pre></td></tr></table></figure>
+
+<p>接著就是下載Raspberry Pi的meta層</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> -b kirkstone git://git.yoctoproject.org/meta-raspberrypi</span><br></pre></td></tr></table></figure>
+
+<p>初始化yocto開發環境</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">source</span> poky/oe-init-build-env build-rpi</span><br></pre></td></tr></table></figure>
+
+<p>加入剛剛下載的Raspberry Pi的meta層</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bitbake-layers add-layer ../meta-raspberrypi</span><br></pre></td></tr></table></figure>
+
+<p>修改配置</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">sed -i <span class="string">&#x27;s/^MACHINE.*/MACHINE ?= &quot;raspberrypi3&quot;/g&#x27;</span> conf/local.conf</span><br><span class="line">sed -i <span class="string">&#x27;/^#DL_DIR ?= &quot;$&#123;TOPDIR&#125;\/downloads&quot;/ a DL_DIR ?= \&quot;$&#123;HOME&#125;/yocto/downloads&quot;&#x27;</span> conf/local.conf</span><br><span class="line">sed -i <span class="string">&#x27;s/^PACKAGE_CLASSES.*/PACKAGE_CLASSES ?= &quot;package_ipk&quot;/g&#x27;</span> conf/local.conf</span><br><span class="line"></span><br><span class="line"><span class="comment"># 設定透過uboot開機</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;RPI_USE_U_BOOT = &quot;1&quot;&#x27;</span> &gt;&gt; conf/local.conf</span><br><span class="line"></span><br><span class="line"><span class="comment">#設定開啟uart console</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;ENABLE_UART = &quot;1&quot;&#x27;</span> &gt;&gt; conf/local.conf</span><br></pre></td></tr></table></figure>
+
+<p>編譯image</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bitbake core-image-minimal</span><br></pre></td></tr></table></figure>
+
+<p>編譯完成後image大概會在下面的路徑</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/my-rpi/build-rpi/tmp/deploy/images/raspberrypi3/core-image-minimal-raspberrypi3.wic.bz2</span><br></pre></td></tr></table></figure>
+<p>他是一個symbollink實際上對應到像這樣檔名的image</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">core-image-minimal-raspberrypi3-20231111193508.rootfs.wic.bz2  </span><br></pre></td></tr></table></figure>
+
+<p>之後就可以透過balenaEtcher等工具燒錄image到SD卡<br><img src="/../images/balenaEtcher_flash_compelete.png"><br>開機後的console畫面會像這樣<br><img src="/../images/console_snapshot.png"><br>這樣就大功告成囉！</p>
+<h2 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h2><p><a target="_blank" rel="noopener" href="https://e61983.github.io/2021-07-26-building-raspberry-pi-systems-with-yocto/">使用 Yocto 打造你的 Raspberry Pi 系統</a></p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a target="_blank" rel="noopener" href="https://github.com/JeffTsengTwn">Projects</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Yocto%E7%B0%A1%E4%BB%8B"><span class="toc-number">2.</span> <span class="toc-text">Yocto簡介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%92%B0%E5%A2%83%E5%BB%BA%E7%BD%AE"><span class="toc-number">3.</span> <span class="toc-text">環境建置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%B8%E4%BE%9D%E5%A5%97%E4%BB%B6%E5%AE%89%E8%A3%9D"><span class="toc-number">4.</span> <span class="toc-text">相依套件安裝</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E5%8F%8A%E7%B7%A8%E8%AD%AF"><span class="toc-number">5.</span> <span class="toc-text">配置及編譯</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99"><span class="toc-number">6.</span> <span class="toc-text">參考資料</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2023/10/20/rpi-yocto-note-1/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2023/10/20/rpi-yocto-note-1/&text=【Yocto】Raspberry PI Yocto 編譯環境建置"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2023/10/20/rpi-yocto-note-1/&title=【Yocto】Raspberry PI Yocto 編譯環境建置"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2023/10/20/rpi-yocto-note-1/&is_video=false&description=【Yocto】Raspberry PI Yocto 編譯環境建置"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=【Yocto】Raspberry PI Yocto 編譯環境建置&body=Check out this article: http://example.com/2023/10/20/rpi-yocto-note-1/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2023/10/20/rpi-yocto-note-1/&title=【Yocto】Raspberry PI Yocto 編譯環境建置"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2023/10/20/rpi-yocto-note-1/&title=【Yocto】Raspberry PI Yocto 編譯環境建置"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2023/10/20/rpi-yocto-note-1/&title=【Yocto】Raspberry PI Yocto 編譯環境建置"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2023/10/20/rpi-yocto-note-1/&title=【Yocto】Raspberry PI Yocto 編譯環境建置"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2023/10/20/rpi-yocto-note-1/&name=【Yocto】Raspberry PI Yocto 編譯環境建置&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2023/10/20/rpi-yocto-note-1/&t=【Yocto】Raspberry PI Yocto 編譯環境建置"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    Jeff Tseng
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/JeffTsengTwn">Projects</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>
